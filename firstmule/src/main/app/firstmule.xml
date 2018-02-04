@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core"
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:spring="http://www.springframework.org/schema/beans"
@@ -11,49 +11,10 @@ http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/a
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
-http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
-
-    <http:listener-config name="httpListenerConfig" host="0.0.0.0" port="${http.port}" doc:name="HTTP Listener Configuration"/>
-    <apikit:config name="apiConfig" raml="helloworld.raml" consoleEnabled="false" doc:name="Router" keepRamlBaseUri="false">
-        <apikit:flow-mapping resource="/helloworld" action="get" content-type="application/json" flow-ref="get:/helloworld"/>
-        <apikit:flow-mapping resource="/helloworld" action="put" content-type="application/json" flow-ref="put:/helloworld"/>
-    </apikit:config>
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
 
     <context:property-placeholder location="api.properties" />
-
-    <flow name="api-main">
-        <http:listener config-ref="httpListenerConfig" path="/api/*" doc:name="HTTP"/>
-        <apikit:router config-ref="apiConfig" doc:name="APIkit Router"/>
-        <exception-strategy ref="apiKitGlobalExceptionMapping" doc:name="Reference Exception Strategy"/>
-    </flow>
-
-    <apikit:mapping-exception-strategy name="apiKitGlobalExceptionMapping">
-        <apikit:mapping statusCode="404">
-            <apikit:exception value="org.mule.module.apikit.exception.NotFoundException" />
-            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
-            <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" doc:name="Set Payload"/>
-        </apikit:mapping>
-        <apikit:mapping statusCode="405">
-            <apikit:exception value="org.mule.module.apikit.exception.MethodNotAllowedException" />
-            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
-            <set-payload value="{ &quot;message&quot;: &quot;Method not allowed&quot; }" doc:name="Set Payload"/>
-        </apikit:mapping>
-        <apikit:mapping statusCode="415">
-            <apikit:exception value="org.mule.module.apikit.exception.UnsupportedMediaTypeException" />
-            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
-            <set-payload value="{ &quot;message&quot;: &quot;Unsupported media type&quot; }" doc:name="Set Payload"/>
-        </apikit:mapping>
-        <apikit:mapping statusCode="406">
-            <apikit:exception value="org.mule.module.apikit.exception.NotAcceptableException" />
-            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
-            <set-payload value="{ &quot;message&quot;: &quot;Not acceptable&quot; }" doc:name="Set Payload"/>
-        </apikit:mapping>
-        <apikit:mapping statusCode="400">
-            <apikit:exception value="org.mule.module.apikit.exception.BadRequestException" />
-            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
-            <set-payload value="{ &quot;message&quot;: &quot;Bad request&quot; }" doc:name="Set Payload"/>
-        </apikit:mapping>
-    </apikit:mapping-exception-strategy>
     <flow name="get:/helloworld" initialState="started">
         <dw:transform-message doc:name="Transform Message">
             <dw:set-payload><![CDATA[%dw 1.0
@@ -65,13 +26,32 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
         </dw:transform-message>
     </flow>
     <flow name="put:/helloworld" initialState="started">
-        <dw:transform-message doc:name="Transform Message">
-            <dw:set-payload><![CDATA[%dw 1.0
+        <logger message="Hello logger : #[json.x]" level="INFO" doc:name="Log PUT Request - Payload"/>
+        <flow-ref name="firstmuleSub_Flow" doc:name="Go to firstmuleSub_Flow"/>
+
+    </flow>
+    <sub-flow name="firstmuleSub_Flow">
+        <choice doc:name="Choice">
+            <when expression="#[validator.notEmpty(payload.x)]">
+                <dw:transform-message doc:name="Transform Message - OK">
+                    <dw:set-payload><![CDATA[%dw 1.0
 %output application/json
 ---
 {
-	message: "stef_" ++ payload.message
+    message: "stef_" ++ payload.message
 }]]></dw:set-payload>
-        </dw:transform-message>
-    </flow>
+                </dw:transform-message>
+            </when>
+            <otherwise>
+                <dw:transform-message doc:name="ERR!">
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	message: "ERR!"
+}]]></dw:set-payload>
+                </dw:transform-message>
+            </otherwise>
+        </choice>
+    </sub-flow>
 </mule>

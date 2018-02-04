@@ -31,6 +31,9 @@ title: Hello world
             "properties": {
               "message": {
                 "type": "string"
+              },
+              "x": {
+                "type": "string"
               }
             }
           }
@@ -40,7 +43,7 @@ title: Hello world
           application/json: # media type
             type: | # structural definition of a response (schema or type)
               {
-                "title": "Hello world Response",
+                "title": "Hello world PUT Response",
                 "type": "object",
                 "properties": {
                   "message": {
