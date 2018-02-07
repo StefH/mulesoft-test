@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <flow name="http-onlyFlow">
+        <http:listener config-ref="httpListenerConfig" path="/http" allowedMethods="put" doc:name="HTTP">
+            <http:response-builder statusCode="200">
+                <http:header headerName="stef" value="abc"/>
+            </http:response-builder>
+        </http:listener>
+        <response>
+            <dw:transform-message doc:name="Transform Message">
+                <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+{
+}]]></dw:set-payload>
+            </dw:transform-message>
+        </response>
+        <set-property propertyName="p" value="pp" doc:name="Property"/>
+        <set-property propertyName="p2" value="#[message.outboundProperties.p]" doc:name="Property"/>
+        <set-variable variableName="httpOK" value="yes" doc:name="Variable"/>
+    </flow>
+</mule>

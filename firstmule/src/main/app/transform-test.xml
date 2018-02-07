@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <flow name="transform-testFlow">
+        <dw:transform-message doc:name="Transform Message json to xml" metadata:id="886f1f4d-7784-48cd-901a-6114008f7260">
+            <dw:input-payload doc:sample="C:\dev\json-users.json" mimeType="application/json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/xml
+---
+employees: {(payload.employees map {
+	employee: {
+		fname: $.firstname,
+		lname: $.lastname
+	}
+})}]]></dw:set-payload>
+        </dw:transform-message>
+        <dw:transform-message doc:name="Transform Message" metadata:id="346b65a2-2bca-4d76-9f24-723f9c16c833">
+            <dw:input-payload doc:sample="C:\dev\json-xml.xml" mimeType="application/xml"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	employees: payload.employees map ({
+		firstname: $.fname,
+		lastname: $.lname
+	})
+}]]></dw:set-payload>
+        </dw:transform-message>
+    </flow>
+    <flow name="transform-testFlow1">
+        <dw:transform-message doc:name="Transform Message" metadata:id="428cbc1d-e5a1-4b26-9ef6-5b51c83be6d7">
+            <dw:input-payload doc:sample="C:\dev\xml-complex.xml" mimeType="application/xml"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload.employees map {
+	firstName: $.@firstname,
+	lastName: $.lastname,
+	id: $.id,
+	email: $.em
+} as :object {
+	class : "com.mulesoft.module.client.model.User"
+}]]></dw:set-payload>
+        </dw:transform-message>
+    </flow>
+</mule>

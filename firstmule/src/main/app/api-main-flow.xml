@@ -20,7 +20,7 @@ http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mu
         <apikit:flow-mapping resource="/helloworld" action="put" content-type="application/json" flow-ref="put:/helloworld"/>
     </apikit:config>
 
-    <context:property-placeholder location="api.properties" />
+    <context:property-placeholder location="api.properties"  />
 
     <flow name="api-main">
         <http:listener config-ref="httpListenerConfig" path="/api/*" doc:name="HTTP"/>

@@ -52,3 +52,35 @@ title: Hello world
                 }
               }
             
+            
+/helloworld2:
+  put: # HTTP method declaration
+    body:
+      application/json: # media type
+        type: | # structural definition of a response (schema or type)
+          {
+            "title": "Hello world PUT",
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "x": {
+                "type": "string"
+              }
+            }
+          }
+    responses: # declare a response
+      200: # HTTP status code
+        body: # declare content of response
+          application/json: # media type
+            type: | # structural definition of a response (schema or type)
+              {
+                "title": "Hello world PUT Response",
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }       
