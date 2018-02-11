@@ -83,4 +83,35 @@ title: Hello world
                     "type": "string"
                   }
                 }
-              }       
+              }
+/payloadarray:
+  put: # HTTP method declaration
+    body:
+      application/json: # media type
+        type: | # structural definition of a response (schema or type)
+          {
+            "title": "payloadarray",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "emailid": {
+                        "type": "string"
+                    }
+                }
+            }
+          }
+    responses: # declare a response
+      200: # HTTP status code
+        body: # declare content of response
+          application/json: # media type
+            type: | # structural definition of a response (schema or type)
+              {
+                "title": "Hello world PUT Response",
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }        

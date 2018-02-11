@@ -8,7 +8,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
     <flow name="http-onlyFlow">
-        <http:listener config-ref="httpListenerConfig" path="/http" allowedMethods="put" doc:name="HTTP">
+        <http:listener config-ref="httpListenerConfig" path="/httptest1" allowedMethods="put" doc:name="HTTP">
             <http:response-builder statusCode="200">
                 <http:header headerName="stef" value="abc"/>
             </http:response-builder>

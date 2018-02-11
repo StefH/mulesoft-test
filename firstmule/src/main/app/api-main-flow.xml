@@ -18,6 +18,7 @@ http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mu
     <apikit:config name="apiConfig" raml="helloworld.raml" consoleEnabled="false" doc:name="Router" keepRamlBaseUri="false">
         <apikit:flow-mapping resource="/helloworld" action="get" content-type="application/json" flow-ref="get:/helloworld"/>
         <apikit:flow-mapping resource="/helloworld" action="put" content-type="application/json" flow-ref="put:/helloworld"/>
+        <apikit:flow-mapping resource="/payloadarray" action="put" content-type="application/json" flow-ref="put:/payload"/>
     </apikit:config>
 
     <context:property-placeholder location="api.properties"  />
